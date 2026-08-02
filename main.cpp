@@ -170,6 +170,26 @@ bool DeleteClient(string AccountNumber)
 
     return IsFound;
 }
+bool UpdateClient(string AccountNumber, stClient NewClient)
+{
+    bool IsFound = false;
+    vector<stClient> vClients = GetAllClients(FilePath);
+
+    for (int i = 0; i < vClients.size(); i++)
+    {
+        if (vClients.at(i).AccountNumber == AccountNumber)
+        {
+            IsFound = true;
+            vClients.at(i) = NewClient;
+            break;
+        }
+    }
+
+    if (IsFound)
+        SaveClientsVector(vClients);
+
+    return IsFound;
+}
 
 // General
 void BackToMainScreen()
@@ -192,6 +212,66 @@ void PrintClientRecord(stClient Client)
     cout << "\nPhone : " << Client.Phone;
     cout << "\nAccount Balance: " << Client.AccountBalance;
     cout << "\n_________________________________________________" << endl;
+}
+string ReadAccountNumber()
+{
+    string AccountNumber = "";
+
+    cout << "Enter Account Number: ";
+    getline(cin >> ws, AccountNumber);
+
+    return AccountNumber;
+}
+string ReadUniqueAccountNumber()
+{
+    stClient Client;
+    string AccountNumber = ReadAccountNumber();
+
+    while (FindClient(AccountNumber, Client))
+    {
+        cout << "Account Number [" << AccountNumber << "] Already Existing, Enter Different one: ";
+        getline(cin >> ws, AccountNumber);
+    }
+
+    return AccountNumber;
+}
+stClient ReadClient()
+{
+    stClient Client;
+
+    Client.AccountNumber = ReadUniqueAccountNumber();
+
+    cout << "Pin Code: ";
+    getline(cin, Client.PinCode);
+
+    cout << "Name: ";
+    getline(cin, Client.Name);
+
+    cout << "Phone: ";
+    getline(cin, Client.Phone);
+
+    Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
+
+    return Client;
+}
+stClient ReadUpdateClient(string AccountNumber)
+{
+    stClient Client;
+
+    Client.AccountNumber = AccountNumber;
+
+    cout << "Pin Code: ";
+    getline(cin >> ws, Client.PinCode);
+
+    cout << "Name: ";
+    getline(cin, Client.Name);
+
+    cout << "Phone: ";
+    getline(cin, Client.Phone);
+
+    Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
+
+    return Client;
 }
 
 // Show Clients Screen
@@ -234,40 +314,6 @@ void ShowClientsScreen()
 }
 
 // Add New Client
-string ReadUniqueAccountNumber()
-{
-    stClient Client;
-    string AccountNumber = "";
-    cout << "Enter Account Number: ";
-    getline(cin >> ws, AccountNumber);
-
-    while (FindClient(AccountNumber, Client))
-    {
-        cout << "Account Number [" << AccountNumber << "] Already Existing, Enter Different one: ";
-        getline(cin >> ws, AccountNumber);
-    }
-
-    return AccountNumber;
-}
-stClient ReadClient()
-{
-    stClient Client;
-
-    Client.AccountNumber = ReadUniqueAccountNumber();
-
-    cout << "Pin Code: ";
-    getline(cin, Client.PinCode);
-
-    cout << "Name: ";
-    getline(cin, Client.Name);
-
-    cout << "Phone: ";
-    getline(cin, Client.Phone);
-
-    Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
-
-    return Client;
-}
 void AddNewClientScreen()
 {
     system("cls");
@@ -295,8 +341,7 @@ void DeleteClientScreen()
     
     stClient Client;
 
-    cout << "Enter AccountNumber: ";
-    cin >> Client.AccountNumber;
+    Client.AccountNumber = ReadAccountNumber();
 
     if (FindClient(Client.AccountNumber, Client))
     {
@@ -310,6 +355,37 @@ void DeleteClientScreen()
         cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
     }
     BackToMainScreen();
+}
+
+// Update Client 
+void UpdateClientScreen()
+{
+    system("cls");
+    PrintScreenHeader("Update Client screen");
+
+    stClient Client;
+    Client.AccountNumber = ReadAccountNumber();
+
+    if (FindClient(Client.AccountNumber, Client))
+    {
+        PrintClientRecord(Client);
+
+        if (Validation::ReadYorN("Sure Want To Update This Record? [Y OR N]"))
+        {
+            Client = ReadUpdateClient(Client.AccountNumber);
+
+            if (UpdateClient(Client.AccountNumber, Client))
+                cout << "Updated Successfully" << endl;
+            else
+                cout << "Something Went Wrong!, Try Again Later" << endl;
+        }
+    }
+    else
+    {
+        cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
+    }
+    BackToMainScreen();
+    
 }
 
 // Exit Screen
@@ -347,6 +423,7 @@ enProgramOptions GetUserOption()
         DeleteClientScreen();
         break;
     case UpdateClientOption:
+        UpdateClientScreen();
         break;
     case FindClientOption:
         break;
