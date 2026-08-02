@@ -6,6 +6,7 @@
 #include <string>
 
 using namespace std;
+
 static const string Delimiter = "#//#";
 static const string FilePath = "Clients.txt";
 
@@ -13,8 +14,8 @@ enum enProgramOptions
 {
     ShowClintsList = 1,
     AddNewClient = 2,
-    DeleteClient = 3,
-    UpdateClient = 4,
+    DeleteClientOption = 3,
+    UpdateClientOption = 4,
     FindClientOption = 5,
     Exit = 6,
 };
@@ -135,26 +136,45 @@ bool SaveClient(stClient Client)
 
     return false;
 }
+void SaveClientsVector(vector<stClient> vClients) // Overwrite File!!!
+{
+    fstream File;
+    File.open(FilePath, ios::out); //overwrite
+
+    if (File.is_open())
+    {
+        for (const stClient& Client : vClients)
+        {
+            File << to_string(Client) << endl;
+        }
+        File.close();
+    }
+}
+bool DeleteClient(string AccountNumber)
+{
+    bool IsFound = false;
+    vector<stClient> vClients = GetAllClients(FilePath);
+
+    for (int i = 0; i < vClients.size(); i++)
+    {
+        if (vClients.at(i).AccountNumber == AccountNumber)
+        {
+            IsFound = true;
+            vClients.erase(vClients.begin() + i);
+            break;
+        }
+    }
+
+    if (IsFound)
+        SaveClientsVector(vClients);
+
+    return IsFound;
+}
 
 // General
 void BackToMainScreen()
 {
     system("pause");
-}
-string ReadUniqueAccountNumber()
-{
-    stClient Client;
-    string AccountNumber = "";
-    cout << "Enter Account Number: ";
-    getline(cin >> ws, AccountNumber);
-
-    while (FindClient(AccountNumber, Client))
-    {
-        cout << "Account Number [" << AccountNumber <<"] Already Existing, Enter Different one: ";
-        getline(cin >> ws, AccountNumber);
-    }
-
-    return AccountNumber;
 }
 void PrintScreenHeader(string ScreenName)
 {
@@ -162,8 +182,19 @@ void PrintScreenHeader(string ScreenName)
     cout << ScreenName << endl;
     cout << "========================================" << endl;
 }
+void PrintClientRecord(stClient Client)
+{
+    cout << "\nThe following is the extracted client record:\n";
+    cout << "_________________________________________________" << endl;
+    cout << "\nAccout Number: " << Client.AccountNumber;
+    cout << "\nPin Code : " << Client.PinCode;
+    cout << "\nName : " << Client.Name;
+    cout << "\nPhone : " << Client.Phone;
+    cout << "\nAccount Balance: " << Client.AccountBalance;
+    cout << "\n_________________________________________________" << endl;
+}
 
-// Show Client Screen
+// Show Clients Screen
 void PrintTableHeader(int NumberOfClients)
 {
     cout << "\n\t\t\t\t\tClient List (" << NumberOfClients << ")Client(s).";
@@ -203,6 +234,21 @@ void ShowClientsScreen()
 }
 
 // Add New Client
+string ReadUniqueAccountNumber()
+{
+    stClient Client;
+    string AccountNumber = "";
+    cout << "Enter Account Number: ";
+    getline(cin >> ws, AccountNumber);
+
+    while (FindClient(AccountNumber, Client))
+    {
+        cout << "Account Number [" << AccountNumber << "] Already Existing, Enter Different one: ";
+        getline(cin >> ws, AccountNumber);
+    }
+
+    return AccountNumber;
+}
 stClient ReadClient()
 {
     stClient Client;
@@ -241,6 +287,31 @@ void AddNewClientScreen()
     BackToMainScreen();
 }
 
+// Delete Client 
+void DeleteClientScreen()
+{
+    system("cls");
+    PrintScreenHeader("Delete Client Screen");
+    
+    stClient Client;
+
+    cout << "Enter AccountNumber: ";
+    cin >> Client.AccountNumber;
+
+    if (FindClient(Client.AccountNumber, Client))
+    {
+        PrintClientRecord(Client);
+
+        if (Validation::ReadYorN("Sure Want To Delete This Record? [Y OR N]"))
+            DeleteClient(Client.AccountNumber) ? cout << "Deleted Successfully" << endl : cout << "Something Went Wrong, Try Later!" << endl;
+    }
+    else
+    {
+        cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
+    }
+    BackToMainScreen();
+}
+
 // Exit Screen
 void EndProgramScreen()
 {
@@ -272,9 +343,10 @@ enProgramOptions GetUserOption()
     case AddNewClient:
         AddNewClientScreen();
         break;
-    case DeleteClient:
+    case DeleteClientOption:
+        DeleteClientScreen();
         break;
-    case UpdateClient:
+    case UpdateClientOption:
         break;
     case FindClientOption:
         break;
@@ -296,5 +368,6 @@ int main()
     {
         MainMenueScreen();
         Option = GetUserOption();
+
     } while (Option != Exit);
 }
