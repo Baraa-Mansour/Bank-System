@@ -15,7 +15,7 @@ enum enProgramOptions
     AddNewClient = 2,
     DeleteClient = 3,
     UpdateClient = 4,
-    FindClient = 5,
+    FindClientOption = 5,
     Exit = 6,
 };
 
@@ -102,12 +102,65 @@ vector<stClient> GetAllClients(string FilePath)
 
     return vClients;
 }
+bool FindClient(string AccountNumber, stClient& Client)
+{
+    vector<stClient> vClients = GetAllClients(FilePath);
+
+    for (const stClient& VectorClient : vClients)
+    {
+        if (VectorClient.AccountNumber == AccountNumber)
+        {
+            Client = VectorClient;
+            return true;
+        }
+    }
+
+    return false;
+}
+bool SaveClient(stClient Client)
+{
+    fstream File;
+    File.open(FilePath, ios::out | ios::app);
+
+    if (File.is_open())
+    {
+        string Record = to_string(Client);
+        File << Record << endl;
+
+        File.close();
+
+        return true;
+    }
+
+
+    return false;
+}
 
 // General
 void BackToMainScreen()
 {
-    cout << "Press Any Key To Back...";
     system("pause");
+}
+string ReadUniqueAccountNumber()
+{
+    stClient Client;
+    string AccountNumber = "";
+    cout << "Enter Account Number: ";
+    getline(cin >> ws, AccountNumber);
+
+    while (FindClient(AccountNumber, Client))
+    {
+        cout << "Account Number [" << AccountNumber <<"] Already Existing, Enter Different one: ";
+        getline(cin >> ws, AccountNumber);
+    }
+
+    return AccountNumber;
+}
+void PrintScreenHeader(string ScreenName)
+{
+    cout << "========================================" << endl;
+    cout << ScreenName << endl;
+    cout << "========================================" << endl;
 }
 
 // Show Client Screen
@@ -149,22 +202,57 @@ void ShowClientsScreen()
     BackToMainScreen();
 }
 
+// Add New Client
+stClient ReadClient()
+{
+    stClient Client;
+
+    Client.AccountNumber = ReadUniqueAccountNumber();
+
+    cout << "Pin Code: ";
+    getline(cin, Client.PinCode);
+
+    cout << "Name: ";
+    getline(cin, Client.Name);
+
+    cout << "Phone: ";
+    getline(cin, Client.Phone);
+
+    Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
+
+    return Client;
+}
+void AddNewClientScreen()
+{
+    system("cls");
+    PrintScreenHeader("Add New Clients Screen");
+    
+    do
+    {
+        stClient Client = ReadClient();
+
+        if (SaveClient(Client))
+            cout << "Added Successfully" << endl;
+        else
+            cout << "Something Went Wrong, Try Later!" << endl;
+
+    } while (Validation::ReadYorN("Add More Clients? [Y OR N]"));
+
+    BackToMainScreen();
+}
+
 // Exit Screen
 void EndProgramScreen()
 {
     system("cls");
-    cout << "========================================" << endl;
-    cout << "\t\tProgram End" << endl;
-    cout << "========================================" << endl;
+    PrintScreenHeader("Program End");
 }
 
 // Main Menue Screen
 void MainMenueScreen()
 {
     system("cls");
-    cout << "========================================" << endl;
-    cout << "\t\tMain Menue" << endl;
-    cout << "========================================" << endl;
+    PrintScreenHeader("Main Menue Screen");
     cout << "\t[1] Show Clients List" << endl;
     cout << "\t[2] Add New Client" << endl;
     cout << "\t[3] Delete Client" << endl;
@@ -182,12 +270,13 @@ enProgramOptions GetUserOption()
         ShowClientsScreen();
         break;
     case AddNewClient:
+        AddNewClientScreen();
         break;
     case DeleteClient:
         break;
     case UpdateClient:
         break;
-    case FindClient:
+    case FindClientOption:
         break;
     case Exit:
         EndProgramScreen();

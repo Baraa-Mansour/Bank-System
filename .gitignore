@@ -52,3 +52,6 @@ desktop.ini
 *.dbmdl
 *.pidb
 *.log
+
+# Data Files
+Clients.txt

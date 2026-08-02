@@ -135,6 +135,9 @@
   <ItemGroup>
     <ClInclude Include="Validation.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Clients.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
