@@ -103,6 +103,13 @@ vector<stClient> GetAllClients(string FilePath)
     return vClients;
 }
 
+// General
+void BackToMainScreen()
+{
+    cout << "Press Any Key To Back...";
+    system("pause");
+}
+
 // Show Client Screen
 void PrintTableHeader(int NumberOfClients)
 {
@@ -129,6 +136,7 @@ void PrintClientsTableRecord(stClient Client)
 }
 void ShowClientsScreen()
 {
+    system("cls");
     vector<stClient> vClients = GetAllClients(FilePath);
 
     PrintTableHeader(vClients.size());
@@ -137,11 +145,14 @@ void ShowClientsScreen()
 
     cout << "\n_______________________________________________________";
     cout << "_________________________________________\n" << endl;
+
+    BackToMainScreen();
 }
 
 // Exit Screen
 void EndProgramScreen()
 {
+    system("cls");
     cout << "========================================" << endl;
     cout << "\t\tProgram End" << endl;
     cout << "========================================" << endl;
@@ -161,7 +172,7 @@ void MainMenueScreen()
     cout << "\t[5] Find Client" << endl;
     cout << "\t[6] Exit" << endl << endl;
 }
-void GetUserOption()
+enProgramOptions GetUserOption()
 {
     enProgramOptions Option = (enProgramOptions)Validation::ReadNumberInRange("Chose Operation: ", 1, 6);
 
@@ -182,12 +193,19 @@ void GetUserOption()
         EndProgramScreen();
         break;
     default:
+        EndProgramScreen();
         break;
     }
+
+    return Option;
 }
 
 int main()
 {
-    MainMenueScreen();
-    GetUserOption();
+    enProgramOptions Option;
+    do
+    {
+        MainMenueScreen();
+        Option = GetUserOption();
+    } while (Option != Exit);
 }
