@@ -10,6 +10,7 @@ using namespace std;
 static const string Delimiter = "#//#";
 static const string FilePath = "Clients.txt";
 
+// Enums
 enum enProgramOptions
 {
     ShowClintsList = 1,
@@ -20,6 +21,7 @@ enum enProgramOptions
     Exit = 6,
 };
 
+// Structs
 struct stClient
 {
     string AccountNumber = "";
@@ -388,6 +390,26 @@ void UpdateClientScreen()
     
 }
 
+// Find Screen
+void FindClientScreen()
+{
+    system("cls");
+    PrintScreenHeader("Find Client Screen");
+    
+    stClient Client;
+    Client.AccountNumber = ReadAccountNumber();
+
+    if (FindClient(Client.AccountNumber, Client))
+    {
+        PrintClientRecord(Client);
+    }
+    else
+    {
+        cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
+    }
+    BackToMainScreen();
+}
+
 // Exit Screen
 void EndProgramScreen()
 {
@@ -426,6 +448,7 @@ enProgramOptions GetUserOption()
         UpdateClientScreen();
         break;
     case FindClientOption:
+        FindClientScreen();
         break;
     case Exit:
         EndProgramScreen();
