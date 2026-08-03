@@ -283,10 +283,9 @@ string ReadExisteningAccoutNumber()
 }
 string ReadUniqueAccountNumber()
 {
-    stClient Client;
     string AccountNumber = ReadAccountNumber();
 
-    while (FindClient(AccountNumber, Client))
+    while (ClientExistsByAccountNumber(AccountNumber, FilePath))
     {
         cout << "Account Number [" << AccountNumber << "] Already Existing, Enter Different one: ";
         getline(cin >> ws, AccountNumber);
