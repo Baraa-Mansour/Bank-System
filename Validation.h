@@ -28,7 +28,7 @@ namespace Validation
 	{
 		double number = 0;
 
-		cout << Message;
+		cout << Message << endl;
 		cin >> number;
 
 		while (cin.fail())
