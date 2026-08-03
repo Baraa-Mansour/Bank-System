@@ -7,11 +7,13 @@
 
 using namespace std;
 
+// Consts
 static const string Delimiter = "#//#";
 static const string FilePath = "Clients.txt";
 
+
 // Enums
-enum enProgramOptions
+enum enMainMenueOption
 {
     ShowClintsList = 1,
     AddNewClient = 2,
@@ -20,6 +22,7 @@ enum enProgramOptions
     FindClientOption = 5,
     Exit = 6,
 };
+
 
 // Structs
 struct stClient
@@ -30,6 +33,7 @@ struct stClient
     string Phone = "";
     double AccountBalance = 0.0;
 };
+
 
 // String
 vector<string> SplitString(string Line, string Delimiter = " ")
@@ -55,8 +59,9 @@ vector<string> SplitString(string Line, string Delimiter = " ")
     return vWords;
 }
 
+
 // Convert
-string to_string(stClient Client)
+string ClientToRecord(stClient Client)
 {
     string Record = "";
 
@@ -81,6 +86,7 @@ stClient RecordToClient(string Record)
 
     return Client;
 }
+
 
 // Files Functions
 vector<stClient> GetAllClients(string FilePath)
@@ -127,7 +133,7 @@ bool SaveClient(stClient Client)
 
     if (File.is_open())
     {
-        string Record = to_string(Client);
+        string Record = ClientToRecord(Client);
         File << Record << endl;
 
         File.close();
@@ -147,7 +153,7 @@ void SaveClientsVector(vector<stClient> vClients) // Overwrite File!!!
     {
         for (const stClient& Client : vClients)
         {
-            File << to_string(Client) << endl;
+            File << ClientToRecord(Client) << endl;
         }
         File.close();
     }
@@ -193,10 +199,12 @@ bool UpdateClient(string AccountNumber, stClient NewClient)
     return IsFound;
 }
 
+
 // General
-void BackToMainScreen()
+void Pause()
 {
-    system("pause");
+    cout << "Press any key to back to Mainmenue . . .";
+    system("pause>0");
 }
 void PrintScreenHeader(string ScreenName)
 {
@@ -215,6 +223,7 @@ void PrintClientRecord(stClient Client)
     cout << "\nAccount Balance: " << Client.AccountBalance;
     cout << "\n_________________________________________________" << endl;
 }
+
 string ReadAccountNumber()
 {
     string AccountNumber = "";
@@ -237,7 +246,8 @@ string ReadUniqueAccountNumber()
 
     return AccountNumber;
 }
-stClient ReadClient()
+
+stClient ReadNewClient()
 {
     stClient Client;
 
@@ -276,7 +286,8 @@ stClient ReadUpdateClient(string AccountNumber)
     return Client;
 }
 
-// Show Clients Screen
+
+// Show Clients
 void PrintTableHeader(int NumberOfClients)
 {
     cout << "\n\t\t\t\t\tClient List (" << NumberOfClients << ")Client(s).";
@@ -300,9 +311,8 @@ void PrintClientsTableRecord(stClient Client)
     cout << "| " << setw(12) << left << Client.AccountBalance;
     cout << endl;
 }
-void ShowClientsScreen()
+void PerformShowClientsScreen()
 {
-    system("cls");
     vector<stClient> vClients = GetAllClients(FilePath);
 
     PrintTableHeader(vClients.size());
@@ -311,19 +321,23 @@ void ShowClientsScreen()
 
     cout << "\n_______________________________________________________";
     cout << "_________________________________________\n" << endl;
+}
+void ShowClientsScreen()
+{
+    PrintScreenHeader("Show Clients Screen");
 
-    BackToMainScreen();
+    PerformShowClientsScreen();
+
+    Pause();
 }
 
+
 // Add New Client
-void AddNewClientScreen()
+void PerformAddNewClient()
 {
-    system("cls");
-    PrintScreenHeader("Add New Clients Screen");
-    
     do
     {
-        stClient Client = ReadClient();
+        stClient Client = ReadNewClient();
 
         if (SaveClient(Client))
             cout << "Added Successfully" << endl;
@@ -331,16 +345,20 @@ void AddNewClientScreen()
             cout << "Something Went Wrong, Try Later!" << endl;
 
     } while (Validation::ReadYorN("Add More Clients? [Y OR N]"));
+}
+void AddNewClientScreen()
+{
+    PrintScreenHeader("Add New Clients Screen");
+    
+    PerformAddNewClient();
 
-    BackToMainScreen();
+    Pause();
 }
 
+
 // Delete Client 
-void DeleteClientScreen()
+void PerformDeleteClient()
 {
-    system("cls");
-    PrintScreenHeader("Delete Client Screen");
-    
     stClient Client;
 
     Client.AccountNumber = ReadAccountNumber();
@@ -356,15 +374,20 @@ void DeleteClientScreen()
     {
         cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
     }
-    BackToMainScreen();
+}
+void DeleteClientScreen()
+{
+    PrintScreenHeader("Delete Client Screen");
+    
+    PerformDeleteClient();
+    
+    Pause();
 }
 
-// Update Client 
-void UpdateClientScreen()
-{
-    system("cls");
-    PrintScreenHeader("Update Client screen");
 
+// Update Client 
+void PerformUpdateClient()
+{
     stClient Client;
     Client.AccountNumber = ReadAccountNumber();
 
@@ -386,16 +409,20 @@ void UpdateClientScreen()
     {
         cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
     }
-    BackToMainScreen();
+}
+void UpdateClientScreen()
+{
+    PrintScreenHeader("Update Client screen");
+
+    PerformUpdateClient();
     
+    Pause();
 }
 
+
 // Find Screen
-void FindClientScreen()
+void PerformFindClientScreen()
 {
-    system("cls");
-    PrintScreenHeader("Find Client Screen");
-    
     stClient Client;
     Client.AccountNumber = ReadAccountNumber();
 
@@ -407,32 +434,34 @@ void FindClientScreen()
     {
         cout << "Account Number [" << Client.AccountNumber << "] Not Found!" << endl;
     }
-    BackToMainScreen();
+}
+void FindClientScreen()
+{
+    PrintScreenHeader("Find Client Screen");
+    
+    PerformFindClientScreen();
+
+    Pause();
 }
 
-// Exit Screen
+
+// Exit
 void EndProgramScreen()
 {
-    system("cls");
     PrintScreenHeader("Program End");
 }
 
-// Main Menue Screen
-void MainMenueScreen()
+
+// Main Menue
+enMainMenueOption GetMainMenuOption()
+{
+    enMainMenueOption Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 6);
+
+    return Option;
+}
+void PerformMainMenuOption(enMainMenueOption Option)
 {
     system("cls");
-    PrintScreenHeader("Main Menue Screen");
-    cout << "\t[1] Show Clients List" << endl;
-    cout << "\t[2] Add New Client" << endl;
-    cout << "\t[3] Delete Client" << endl;
-    cout << "\t[4] Update Client" << endl;
-    cout << "\t[5] Find Client" << endl;
-    cout << "\t[6] Exit" << endl << endl;
-}
-enProgramOptions GetUserOption()
-{
-    enProgramOptions Option = (enProgramOptions)Validation::ReadNumberInRange("Chose Operation: ", 1, 6);
-
     switch (Option)
     {
     case ShowClintsList:
@@ -457,17 +486,33 @@ enProgramOptions GetUserOption()
         EndProgramScreen();
         break;
     }
-
-    return Option;
 }
+
+void MainMenuScreen()
+{
+    PrintScreenHeader("Main Menue Screen");
+    cout << "\t[1] Show Clients List" << endl;
+    cout << "\t[2] Add New Client" << endl;
+    cout << "\t[3] Delete Client" << endl;
+    cout << "\t[4] Update Client" << endl;
+    cout << "\t[5] Find Client" << endl;
+    cout << "\t[6] Exit" << endl << endl;
+}
+
 
 int main()
 {
-    enProgramOptions Option;
+    enMainMenueOption Option;
+
     do
     {
-        MainMenueScreen();
-        Option = GetUserOption();
+        system("cls");
 
-    } while (Option != Exit);
+        MainMenuScreen();
+
+        Option = GetMainMenuOption();
+
+        PerformMainMenuOption(Option);
+
+    } while (Option != enMainMenueOption::Exit);
 }
