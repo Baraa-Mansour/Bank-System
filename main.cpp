@@ -112,7 +112,6 @@ stClient RecordToClient(string Record)
 
     return Client;
 }
-
 string UserToRecord(stUser User)
 {
     string Record = "";
@@ -130,10 +129,11 @@ stUser RecordToUser(string Record)
 
     User.Username = vRecord.at(0);
     User.Password = vRecord.at(1);
-    User.Permissions = stod(vRecord.at(2));
+    User.Permissions = stoi(vRecord.at(2));
 
     return User;
 }
+
 
 // Files Functions
 vector<string> GetAllRecord(string FilePath)
@@ -168,6 +168,21 @@ vector<stUser> GetAllUsers()
     }
 
     return vUsers;
+}
+bool FindUser(string Username, stUser& User)
+{
+    vector<stUser> vUsers = GetAllUsers();
+
+    for (const stUser& vUser : vUsers)
+    {
+        if (vUser.Username == Username)
+        {
+            User = vUser;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 vector<stClient> GetAllClients()
@@ -312,6 +327,16 @@ void PrintScreenHeader(string ScreenName)
     cout << ScreenName << endl;
     cout << "========================================" << endl;
 }
+void PrintOptionList(vector<string> ListItems)
+{
+    for (int i = 0; i < ListItems.size(); i++)
+    {
+        cout << "\t[" << i+1 << "] " << ListItems[i] << endl;
+    }
+}
+
+
+// Client System
 void PrintClientRecord(stClient Client)
 {
     cout << "\nThe following is the extracted client record:\n";
@@ -323,31 +348,21 @@ void PrintClientRecord(stClient Client)
     cout << "\nAccount Balance: " << Client.AccountBalance;
     cout << "\n_________________________________________________" << endl;
 }
-
-string ReadAccountNumber()
-{
-    string AccountNumber = "";
-
-    cout << "Enter Account Number: ";
-    getline(cin >> ws, AccountNumber);
-
-    return AccountNumber;
-}
 string ReadExisteningAccoutNumber()
 {
-    string AccountNumber = ReadAccountNumber();
+    string AccountNumber = Validation::ReadString("Account Number");
 
     while (!ClientExistsByAccountNumber(AccountNumber, ClientsFilePath))
     {
         cout << "NotFound!, Try Again: " << endl;
-        AccountNumber = ReadAccountNumber();
+        AccountNumber = Validation::ReadString("Account Number");
     }
 
     return AccountNumber;
 }
 string ReadUniqueAccountNumber()
 {
-    string AccountNumber = ReadAccountNumber();
+    string AccountNumber = Validation::ReadString("Account Number");
 
     while (ClientExistsByAccountNumber(AccountNumber, ClientsFilePath))
     {
@@ -357,7 +372,6 @@ string ReadUniqueAccountNumber()
 
     return AccountNumber;
 }
-
 stClient ReadNewClient()
 {
     stClient Client;
@@ -397,16 +411,6 @@ stClient ReadUpdateClient(string AccountNumber)
     return Client;
 }
 
-void PrintOptionList(vector<string> ListItems)
-{
-    for (int i = 0; i < ListItems.size(); i++)
-    {
-        cout << "\t[" << i+1 << "] " << ListItems[i] << endl;
-    }
-}
-
-
-// Client System
 // Show Clients
 void PrintTableHeader(int NumberOfClients)
 {
@@ -451,7 +455,6 @@ void ShowClientsScreen()
     Pause();
 }
 
-
 // Add New Client
 void PerformAddNewClient()
 {
@@ -475,13 +478,12 @@ void AddNewClientScreen()
     Pause();
 }
 
-
 // Delete Client 
 void PerformDeleteClient()
 {
     stClient Client;
 
-    Client.AccountNumber = ReadAccountNumber();
+    Client.AccountNumber = Validation::ReadString("Account Number");
 
     if (FindClient(Client.AccountNumber, Client))
     {
@@ -504,12 +506,11 @@ void DeleteClientScreen()
     Pause();
 }
 
-
 // Update Client 
 void PerformUpdateClient()
 {
     stClient Client;
-    Client.AccountNumber = ReadAccountNumber();
+    Client.AccountNumber = Validation::ReadString("Account Number");
 
     if (FindClient(Client.AccountNumber, Client))
     {
@@ -539,12 +540,11 @@ void UpdateClientScreen()
     Pause();
 }
 
-
 // Find Client
 void PerformFindClientScreen()
 {
     stClient Client;
-    Client.AccountNumber = ReadAccountNumber();
+    Client.AccountNumber = Validation::ReadString("Account Number");
 
     if (FindClient(Client.AccountNumber, Client))
     {
@@ -603,7 +603,6 @@ void DepositScreen()
     Pause();
 }
 
-
 // Withdraw
 double ReadWithdrawAmount(double AccountBalance)
 {
@@ -647,7 +646,6 @@ void WithdrawScreen()
 
     Pause();
 }
-
 
 // Total Balances
 void PrintBalancesTableHeader(int NumberOfClients)
@@ -695,7 +693,6 @@ void TotalBalancesScreen()
     Pause();
 }
 
-
 // Transaction Mainmenu
 enTransactionOption GetTransactionOption()
 {
@@ -723,7 +720,6 @@ void PerformTransactionOption(enTransactionOption Option)
         break;
     }
 }
-
 void TransactionMainmenuScreen()
 {
     PrintScreenHeader("Transaction Screen");
@@ -753,6 +749,15 @@ void RunTransactionSystem()
 
 
 // User System
+void PrintUserRecord(stUser User)
+{
+    cout << "\nThe following is the extracted User record:\n";
+    cout << "_________________________________________________" << endl;
+    cout << "\nUsername: " << User.Username;
+    cout << "\nPassword : " << User.Password;
+    cout << "\nPermissions : " << User.Permissions;
+    cout << "\n_________________________________________________" << endl;
+}
 // Show Users
 void PrintUsersTableHeader(int NumberOfUsers)
 {
@@ -796,6 +801,24 @@ void ShowUserScreen()
     Pause();
 }
 
+// Find User
+void PerformFindUser()
+{
+    stUser User;
+    string Username = Validation::ReadString("Username");
+
+    if (FindUser(Username, User))
+        PrintUserRecord(User);
+    else
+        cout << "Username [" << Username << "] Not Found!" << endl;
+}
+void FindUserScreen()
+{
+    PrintScreenHeader("Find User");
+    PerformFindUser();
+    Pause();
+}
+
 // User Manage Mainmenu
 void PrintUserManageOptionList()
 {
@@ -831,6 +854,7 @@ void PerformUserManagOption(enUserManagmentOption Option)
     case UpdateUserOption:
         break;
     case FindUserOption:
+        FindUserScreen();
         break;
     case UmToMainmenu:
         break;

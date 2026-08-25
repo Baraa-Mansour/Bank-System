@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <string>
+
 
 using namespace std;
 
@@ -84,6 +86,16 @@ namespace Validation
 		} while (tolower(Choice) != 'y' && tolower(Choice) != 'n');
 
 		return tolower(Choice) == 'y';
+	}
+
+	string ReadString(string Message)
+	{
+		string Value = "";
+
+		cout << "Enter " << Message << " : ";
+		getline(cin >> ws, Value);
+
+		return Value;
 	}
 }
 
