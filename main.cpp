@@ -11,6 +11,7 @@ using namespace std;
 static const string Delimiter = "#//#";
 static const string ClientsFilePath = "Clients.txt";
 static const string UsersFilePath = "Users.txt";
+static const string AdminUsername = "admin";
 
 
 // Enums
@@ -808,6 +809,26 @@ bool DeleteUser(string Username)
 
     return IsFound;
 }
+bool UpdateUser(string Username, stUser NewUser)
+{
+    bool IsFound = false;
+    vector<stUser> vUsers = GetAllUsers();
+
+    for (int i = 0; i < vUsers.size(); i++)
+    {
+        if (vUsers.at(i).Username == Username)
+        {
+            IsFound = true;
+            vUsers.at(i) = NewUser;
+            break;
+        }
+    }
+
+    if (IsFound)
+        SaveUsersVector(vUsers);
+
+    return IsFound;
+}
 bool FindUser(string Username, stUser& User)
 {
     vector<stUser> vUsers = GetAllUsers();
@@ -885,11 +906,12 @@ int ReadUserPermissions()
 }
 string ReadUniqueUsername()
 {
-    string Username = Validation::ReadString("Enter Username");
+    string Username = Validation::ReadString("Username");
 
     while (UserExistsByUsername(Username))
     {
-        Username = Validation::ReadString("Username is Already Used, Try Another one");
+        cout << "Username is Already Used, Try Another one: " << endl;
+        Username = Validation::ReadString("Username");
     }
     
     return Username;
@@ -898,7 +920,17 @@ stUser ReadNewUser()
 {
     stUser User;
     User.Username = ReadUniqueUsername();
-    User.Password = Validation::ReadString("Enter Password");
+    User.Password = Validation::ReadString("Password");
+    User.Permissions = ReadUserPermissions();
+
+    return User;
+}
+stUser ReadUpdateUser(string Username)
+{
+    stUser User;
+
+    User.Username = Username;
+    User.Password = Validation::ReadString("Password");
     User.Permissions = ReadUserPermissions();
 
     return User;
@@ -976,6 +1008,12 @@ void PerformDeleteUser()
     stUser User;
     User.Username = Validation::ReadString("Username");
 
+    if (User.Username == AdminUsername)
+    {
+        cout << "Cant Delete Admin!" << endl;
+        return;
+    }
+
     if (FindUser(User.Username, User))
     {
         PrintUserRecord(User);
@@ -993,6 +1031,44 @@ void DeleteUserScreen()
 {
     PrintScreenHeader("Delete User");
     PerformDeleteUser();
+    Pause();
+}
+
+// Update User
+void PerformUpdateUser()
+{
+    stUser User;
+    User.Username = Validation::ReadString("Username");
+
+    if (User.Username == AdminUsername)
+    {
+        cout << "Cant Update Admin!" << endl;
+        return;
+    }
+
+    if (FindUser(User.Username, User))
+    {
+        PrintUserRecord(User);
+
+        if (Validation::ReadYorN("Sure Want To Update This Record? [Y OR N]"))
+        {
+            User = ReadUpdateUser(User.Username);
+
+            if (UpdateUser(User.Username, User))
+                cout << "Updated Successfully" << endl;
+            else
+                cout << "Something Went Wrong!, Try Again Later" << endl;
+        }
+    }
+    else
+    {
+        cout << "Username [" << User.Username << "] Not Found!" << endl;
+    }
+}
+void UpdateUserScreen()
+{
+    PrintScreenHeader("Update User");
+    PerformUpdateUser();
     Pause();
 }
 
@@ -1049,6 +1125,7 @@ void PerformUserManagOption(enUserManagmentOption Option)
         DeleteUserScreen();
         break;
     case UpdateUserOption:
+        UpdateUserScreen();
         break;
     case FindUserOption:
         FindUserScreen();

@@ -88,11 +88,11 @@ namespace Validation
 		return tolower(Choice) == 'y';
 	}
 
-	string ReadString(string Message)
+	string ReadString(string Param)
 	{
 		string Value = "";
 
-		cout << "Enter " << Message << " : ";
+		cout << "Enter " << Param << " : ";
 		getline(cin >> ws, Value);
 
 		return Value;
