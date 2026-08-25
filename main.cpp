@@ -12,6 +12,7 @@ static const string Delimiter = "#//#";
 static const string FilePath = "Clients.txt";
 
 
+
 // Enums
 enum enMainMenueOption
 {
@@ -21,7 +22,8 @@ enum enMainMenueOption
     UpdateClientOption = 4,
     FindClientOption = 5,
     TransactionOption = 6,
-    Exit = 7,
+    UserManagment = 7,
+    Logout = 8,
 };
 enum enTransactionOption
 {
@@ -334,6 +336,7 @@ stClient ReadUpdateClient(string AccountNumber)
 }
 
 
+// Client System
 // Show Clients
 void PrintTableHeader(int NumberOfClients)
 {
@@ -490,10 +493,10 @@ void FindClientScreen()
 
     Pause();
 }
+// End Client System
 
 
 // Transaction System
-
 // Deposit 
 double ReadDepositAmount()
 {
@@ -676,21 +679,23 @@ void RunTransactionSystem()
 
     } while (Option != enTransactionOption::Mainmenu);
 }
-
 // End Transaction System
 
 
-// Exit
-void EndProgramScreen()
+// User System
+void UserManagmentScreen()
 {
-    PrintScreenHeader("Program End");
+    PrintScreenHeader("User Managment");
+    cout << "Not implemented Yet" << endl;
+
+    Pause();
 }
 
 
 // Main Menue
 enMainMenueOption GetMainMenuOption()
 {
-    enMainMenueOption Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 7);
+    enMainMenueOption Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 8);
 
     return Option;
 }
@@ -717,15 +722,14 @@ void PerformMainMenuOption(enMainMenueOption Option)
     case TransactionOption:
         RunTransactionSystem();
         break;
-    case Exit:
-        EndProgramScreen();
+    case UserManagment:
+        UserManagmentScreen();
         break;
+    case Logout:
     default:
-        EndProgramScreen();
         break;
     }
 }
-
 void MainMenuScreen()
 {
     PrintScreenHeader("Main Menue Screen");
@@ -735,7 +739,8 @@ void MainMenuScreen()
     cout << "\t[4] Update Client" << endl;
     cout << "\t[5] Find Client" << endl;
     cout << "\t[6] Transaction" << endl;
-    cout << "\t[7] Exit" << endl << endl;
+    cout << "\t[7] User Managment" << endl;
+    cout << "\t[8] Logout" << endl << endl;
 }
 
 
@@ -753,5 +758,5 @@ int main()
 
         PerformMainMenuOption(Option);
 
-    } while (Option != enMainMenueOption::Exit);
+    } while (Option != enMainMenueOption::Logout);
 }
