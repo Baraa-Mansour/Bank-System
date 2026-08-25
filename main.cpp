@@ -30,7 +30,16 @@ enum enTransactionOption
     DepositOption = 1,
     WithdrawOption = 2,
     TotalBalancesOption = 3,
-    Mainmenu = 4
+    TrToMainmenu = 4
+};
+enum enUserManagmentOption
+{
+    ShowUsersList = 1,
+    AddNewUsers = 2,
+    DeleteUserOption = 3,
+    UpdateUserOption = 4,
+    FindUserOption = 5,
+    UmToMainmenu = 6,
 };
 
 
@@ -333,6 +342,14 @@ stClient ReadUpdateClient(string AccountNumber)
     Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
 
     return Client;
+}
+
+void PrintOptionList(vector<string> ListItems)
+{
+    for (int i = 0; i < ListItems.size(); i++)
+    {
+        cout << "\t[" << i+1 << "] " << ListItems[i] << endl;
+    }
 }
 
 
@@ -647,7 +664,7 @@ void PerformTransactionOption(enTransactionOption Option)
     case TotalBalancesOption:
         TotalBalancesScreen();
         break;
-    case Mainmenu:
+    case TrToMainmenu:
         break;
     default:
         break;
@@ -677,18 +694,65 @@ void RunTransactionSystem()
 
         PerformTransactionOption(Option);
 
-    } while (Option != enTransactionOption::Mainmenu);
+    } while (Option != enTransactionOption::TrToMainmenu);
 }
 // End Transaction System
 
 
 // User System
+void PrintUserManageOptionList()
+{
+    vector<string> ListItems =
+    {
+        "Show Users List",
+        "Add New Users",
+        "Delete User",
+        "Update User",
+        "Find User",
+        "Mainmenu"
+    };
+    PrintOptionList(ListItems);
+}
+enUserManagmentOption GetUserManagOption()
+{
+    enUserManagmentOption Option = (enUserManagmentOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 6);
+
+    return Option;
+}
+void PerformUserManagOption(enUserManagmentOption Option)
+{
+    switch (Option)
+    {
+    case ShowUsersList:
+        break;
+    case AddNewUsers:
+        break;
+    case DeleteUserOption:
+        break;
+    case UpdateUserOption:
+        break;
+    case FindUserOption:
+        break;
+    case UmToMainmenu:
+        break;
+    default:
+        break;
+    }
+}
 void UserManagmentScreen()
 {
-    PrintScreenHeader("User Managment");
-    cout << "Not implemented Yet" << endl;
+    enUserManagmentOption Option;
+    do
+    {
+        system("cls");
 
-    Pause();
+        PrintScreenHeader("User Managment");
+        PrintUserManageOptionList();
+
+        Option = GetUserManagOption();
+        PerformUserManagOption(Option);
+
+    } while (Option != enUserManagmentOption::UmToMainmenu);
 }
 
 
