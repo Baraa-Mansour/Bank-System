@@ -9,7 +9,8 @@ using namespace std;
 
 // Consts
 static const string Delimiter = "#//#";
-static const string FilePath = "Clients.txt";
+static const string ClientsFilePath = "Clients.txt";
+static const string UsersFilePath = "Users.txt";
 
 
 
@@ -51,6 +52,12 @@ struct stClient
     string Name = "";
     string Phone = "";
     double AccountBalance = 0.0;
+};
+struct stUser
+{
+    string Username = "Unknown";
+    string Password = "1234";
+    int Permissions = 0;
 };
 
 
@@ -106,33 +113,79 @@ stClient RecordToClient(string Record)
     return Client;
 }
 
+string UserToRecord(stUser User)
+{
+    string Record = "";
+
+    Record += User.Username + Delimiter;
+    Record += User.Password + Delimiter;
+    Record += to_string(User.Permissions);
+
+    return Record;
+}
+stUser RecordToUser(string Record)
+{
+    vector<string> vRecord = SplitString(Record, Delimiter);
+    stUser User;
+
+    User.Username = vRecord.at(0);
+    User.Password = vRecord.at(1);
+    User.Permissions = stod(vRecord.at(2));
+
+    return User;
+}
 
 // Files Functions
-vector<stClient> GetAllClients(string FilePath)
+vector<string> GetAllRecord(string FilePath)
 {
-    vector<stClient> vClients;
+    vector<string> vRecords;
     fstream File;
     File.open(FilePath, ios::in);
 
     if (File.is_open())
     {
         string Record = "";
-        stClient Client;
-
         while (getline(File, Record))
         {
-            Client = RecordToClient(Record);
-            vClients.push_back(Client);
+            vRecords.push_back(Record);
         }
 
         File.close();
+    }
+
+    return vRecords;
+}
+
+vector<stUser> GetAllUsers()
+{
+    vector<string> vRecords = GetAllRecord(UsersFilePath);
+    vector<stUser> vUsers;
+
+    for (const string& Record : vRecords)
+    {
+        stUser User = RecordToUser(Record);
+        vUsers.push_back(User);
+    }
+
+    return vUsers;
+}
+
+vector<stClient> GetAllClients()
+{
+    vector<string> vRecords = GetAllRecord(ClientsFilePath);
+    vector<stClient> vClients;
+    
+    for (const string& Record : vRecords)
+    {
+        stClient client = RecordToClient(Record);
+        vClients.push_back(client);
     }
 
     return vClients;
 }
 bool FindClient(string AccountNumber, stClient& Client)
 {
-    vector<stClient> vClients = GetAllClients(FilePath);
+    vector<stClient> vClients = GetAllClients();
 
     for (const stClient& VectorClient : vClients)
     {
@@ -148,7 +201,7 @@ bool FindClient(string AccountNumber, stClient& Client)
 bool SaveClient(stClient Client)
 {
     fstream File;
-    File.open(FilePath, ios::out | ios::app);
+    File.open(ClientsFilePath, ios::out | ios::app);
 
     if (File.is_open())
     {
@@ -166,7 +219,7 @@ bool SaveClient(stClient Client)
 void SaveClientsVector(vector<stClient> vClients) // Overwrite File!!!
 {
     fstream File;
-    File.open(FilePath, ios::out); //overwrite
+    File.open(ClientsFilePath, ios::out); //overwrite
 
     if (File.is_open())
     {
@@ -180,7 +233,7 @@ void SaveClientsVector(vector<stClient> vClients) // Overwrite File!!!
 bool DeleteClient(string AccountNumber)
 {
     bool IsFound = false;
-    vector<stClient> vClients = GetAllClients(FilePath);
+    vector<stClient> vClients = GetAllClients();
 
     for (int i = 0; i < vClients.size(); i++)
     {
@@ -200,7 +253,7 @@ bool DeleteClient(string AccountNumber)
 bool UpdateClient(string AccountNumber, stClient NewClient)
 {
     bool IsFound = false;
-    vector<stClient> vClients = GetAllClients(FilePath);
+    vector<stClient> vClients = GetAllClients();
 
     for (int i = 0; i < vClients.size(); i++)
     {
@@ -284,7 +337,7 @@ string ReadExisteningAccoutNumber()
 {
     string AccountNumber = ReadAccountNumber();
 
-    while (!ClientExistsByAccountNumber(AccountNumber, FilePath))
+    while (!ClientExistsByAccountNumber(AccountNumber, ClientsFilePath))
     {
         cout << "NotFound!, Try Again: " << endl;
         AccountNumber = ReadAccountNumber();
@@ -296,7 +349,7 @@ string ReadUniqueAccountNumber()
 {
     string AccountNumber = ReadAccountNumber();
 
-    while (ClientExistsByAccountNumber(AccountNumber, FilePath))
+    while (ClientExistsByAccountNumber(AccountNumber, ClientsFilePath))
     {
         cout << "Account Number [" << AccountNumber << "] Already Existing, Enter Different one: ";
         getline(cin >> ws, AccountNumber);
@@ -380,7 +433,7 @@ void PrintClientsTableRecord(stClient Client)
 }
 void PerformShowClientsScreen()
 {
-    vector<stClient> vClients = GetAllClients(FilePath);
+    vector<stClient> vClients = GetAllClients();
 
     PrintTableHeader(vClients.size());
     for (const stClient& Client : vClients)
@@ -618,7 +671,7 @@ void PrintBalancesTableRecord(stClient Client)
 }
 void PerformTotalBalances()
 {
-    vector<stClient> vClients = GetAllClients(FilePath);
+    vector<stClient> vClients = GetAllClients();
     double TotalBalances = 0;
 
     PrintBalancesTableHeader(vClients.size());
@@ -700,6 +753,50 @@ void RunTransactionSystem()
 
 
 // User System
+// Show Users
+void PrintUsersTableHeader(int NumberOfUsers)
+{
+    cout << "\n\t\t\t\t\tClient List (" << NumberOfUsers << ")User(s).";
+    cout << "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+    cout << "| " << left << setw(20) << "Username";
+    cout << "| " << left << setw(30) << "Password";
+    cout << "| " << left << setw(12) << "Permissions";
+
+    cout << "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+}
+void PrintUsersTableRecord(stUser User)
+{
+    cout << endl;
+    cout << "| " << setw(20) << left << User.Username;
+    cout << "| " << setw(30) << left << User.Password;
+    cout << "| " << setw(12) << left << User.Permissions;
+    cout << endl;
+}
+void PrintUsersTableRecords(vector<stUser> vUsers)
+{
+    for (const stUser& User : vUsers)
+        PrintUsersTableRecord(User);
+
+    cout << "\n_______________________________________________________";
+    cout << "_________________________________________\n" << endl;
+}
+void PerformShowUsers()
+{
+    vector<stUser> Users = GetAllUsers();
+
+    PrintUsersTableHeader(Users.size());
+    PrintUsersTableRecords(Users);
+}
+void ShowUserScreen()
+{
+    PrintScreenHeader("Show Users");
+    PerformShowUsers();
+    Pause();
+}
+
+// User Manage Mainmenu
 void PrintUserManageOptionList()
 {
     vector<string> ListItems =
@@ -721,9 +818,11 @@ enUserManagmentOption GetUserManagOption()
 }
 void PerformUserManagOption(enUserManagmentOption Option)
 {
+    system("cls");
     switch (Option)
     {
     case ShowUsersList:
+        ShowUserScreen();
         break;
     case AddNewUsers:
         break;
@@ -754,6 +853,7 @@ void UserManagmentScreen()
 
     } while (Option != enUserManagmentOption::UmToMainmenu);
 }
+// End User System
 
 
 // Main Menue
