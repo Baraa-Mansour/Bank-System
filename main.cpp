@@ -437,14 +437,11 @@ stClient ReadNewClient()
 
     Client.AccountNumber = ReadUniqueAccountNumber();
 
-    cout << "Pin Code: ";
-    getline(cin, Client.PinCode);
+    Client.PinCode = Validation::ReadString("PinCode");
 
-    cout << "Name: ";
-    getline(cin, Client.Name);
+    Client.Name = Validation::ReadString("Name");
 
-    cout << "Phone: ";
-    getline(cin, Client.Phone);
+    Client.Phone = Validation::ReadString("Phone");
 
     Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
 
@@ -456,14 +453,11 @@ stClient ReadUpdateClient(string AccountNumber)
 
     Client.AccountNumber = AccountNumber;
 
-    cout << "Pin Code: ";
-    getline(cin >> ws, Client.PinCode);
+    Client.PinCode = Validation::ReadString("PinCode");
 
-    cout << "Name: ";
-    getline(cin, Client.Name);
+    Client.Name = Validation::ReadString("Name");
 
-    cout << "Phone: ";
-    getline(cin, Client.Phone);
+    Client.Phone = Validation::ReadString("Phone");
 
     Client.AccountBalance = Validation::ReadPositiveDoubleNumber("Enter Balance: ");
 
