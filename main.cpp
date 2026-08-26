@@ -1211,28 +1211,60 @@ void PerformMainMenuOption(enMainMenueOption Option)
 }
 void MainMenuScreen()
 {
-    PrintScreenHeader("Main Menue Screen");
-    PrintMainmenueOptionList();
-}
-
-void LiginScreen()
-{
-    PrintScreenHeader("LoginScreen");
-}
-
-int main()
-{
     enMainMenueOption Option;
 
     do
     {
         system("cls");
 
-        MainMenuScreen();
+        PrintScreenHeader("Mainmenue Screen");
+        PrintMainmenueOptionList();
 
         Option = GetMainMenuOption();
 
         PerformMainMenuOption(Option);
 
     } while (Option != enMainMenueOption::Logout);
+}
+
+// Login
+bool VerifyPassword(stUser User, string Password)
+{
+    return User.Password == Password;
+}
+bool Login(string Username, string Password)
+{
+    stUser User;
+    if (FindUser(Username, User))
+    {
+        if (VerifyPassword(User, Password))
+        {
+            CurrentUser = User;
+            return true;
+        }
+    }
+    
+    return false;
+}
+void LoginScreen()
+{
+    PrintScreenHeader("LoginScreen");
+    string Username = Validation::ReadString("Username");
+    string Password = Validation::ReadString("Password");
+
+    while (!Login(Username, Password))
+    {
+        cout << "Invalid Username/Password, Try Again!" << endl;
+        Username = Validation::ReadString("Username");
+        Password = Validation::ReadString("Password");
+    }
+}
+
+int main()
+{
+    while (true)
+    {
+        LoginScreen();
+        MainMenuScreen();
+    }
 }
