@@ -7,11 +7,30 @@
 
 using namespace std;
 
+
+// Structs
+struct stClient
+{
+    string AccountNumber = "";
+    string PinCode = "";
+    string Name = "";
+    string Phone = "";
+    double AccountBalance = 0.0;
+};
+struct stUser
+{
+    string Username = "Unknown";
+    string Password = "1234";
+    int Permissions = 0;
+};
+
+
 // Consts
 static const string Delimiter = "#//#";
 static const string ClientsFilePath = "Clients.txt";
 static const string UsersFilePath = "Users.txt";
 static const string AdminUsername = "admin";
+static stUser CurrentUser;
 
 
 // Enums
@@ -51,23 +70,6 @@ enum enPermissions
     FIND_CLIENTS = 16,
     MANAGE_TRANSACTIONS = 32,
     MANAGE_USERS = 64
-};
-
-
-// Structs
-struct stClient
-{
-    string AccountNumber = "";
-    string PinCode = "";
-    string Name = "";
-    string Phone = "";
-    double AccountBalance = 0.0;
-};
-struct stUser
-{
-    string Username = "Unknown";
-    string Password = "1234";
-    int Permissions = 0;
 };
 
 
@@ -1155,6 +1157,21 @@ void UserManagmentScreen()
 
 
 // Main Menue
+void PrintMainmenueOptionList()
+{
+    vector<string> ListItems =
+    {
+        "Show Clients List",
+        "Add New Client",
+        "Delete Client",
+        "Update Client",
+        "Find Client",
+        "Transaction",
+        "User Managment",
+        "Logout"
+    };
+    PrintOptionList(ListItems);
+}
 enMainMenueOption GetMainMenuOption()
 {
     enMainMenueOption Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 8);
@@ -1195,16 +1212,13 @@ void PerformMainMenuOption(enMainMenueOption Option)
 void MainMenuScreen()
 {
     PrintScreenHeader("Main Menue Screen");
-    cout << "\t[1] Show Clients List" << endl;
-    cout << "\t[2] Add New Client" << endl;
-    cout << "\t[3] Delete Client" << endl;
-    cout << "\t[4] Update Client" << endl;
-    cout << "\t[5] Find Client" << endl;
-    cout << "\t[6] Transaction" << endl;
-    cout << "\t[7] User Managment" << endl;
-    cout << "\t[8] Logout" << endl << endl;
+    PrintMainmenueOptionList();
 }
 
+void LiginScreen()
+{
+    PrintScreenHeader("LoginScreen");
+}
 
 int main()
 {
