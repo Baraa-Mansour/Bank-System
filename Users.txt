@@ -2,4 +2,3 @@ admin#//#1234#//#-1
 user1#//#password#//#17
 user2#//#password#//#63
 user3#//#password#//#1
-user4#//#password1#//#0

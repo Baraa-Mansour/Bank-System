@@ -169,6 +169,40 @@ vector<string> vUsersTovRecods(vector<stUser> vUsers)
 }
 
 
+// Security
+bool VerifyPassword(stUser User, string Password)
+{
+    return User.Password == Password;
+}
+bool VerifyPermission(stUser User, enPermissions Permissions)
+{
+    return (User.Permissions & Permissions) == Permissions;
+}
+bool VerifyPermissionByOption(stUser User, enMainMenueOption Option)
+{
+    switch (Option)
+    {
+    case ShowClintsList:
+        return VerifyPermission(User, READ_CLIENTS);
+    case AddNewClient:
+        return VerifyPermission(User, ADD_CLIENTS);
+    case DeleteClientOption:
+        return VerifyPermission(User, DELETE_CLIENTS);
+    case UpdateClientOption:
+        return VerifyPermission(User, UPDATE_CLIENTS);
+    case FindClientOption:
+        return VerifyPermission(User, FIND_CLIENTS);
+    case TransactionOption:
+        return VerifyPermission(User, MANAGE_TRANSACTIONS);
+    case UserManagment:
+        return VerifyPermission(User, MANAGE_USERS);
+    case Logout:
+    default:
+        return true;
+    }
+}
+
+
 // Files Functions
 vector<string> GetAllRecord(string FilePath)
 {
@@ -1176,11 +1210,18 @@ enMainMenueOption GetMainMenuOption()
 {
     enMainMenueOption Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 8);
 
+    while (!VerifyPermissionByOption(CurrentUser, Option))
+    {
+        cout << "No Permission, Connect Admin!" << endl;
+        Option = (enMainMenueOption)Validation::ReadNumberInRange("Chose Operation: ", 1, 8);
+    }
+
     return Option;
 }
 void PerformMainMenuOption(enMainMenueOption Option)
 {
     system("cls");
+
     switch (Option)
     {
     case ShowClintsList:
@@ -1228,10 +1269,6 @@ void MainMenuScreen()
 }
 
 // Login
-bool VerifyPassword(stUser User, string Password)
-{
-    return User.Password == Password;
-}
 bool Login(string Username, string Password)
 {
     stUser User;
