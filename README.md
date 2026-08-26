@@ -8,8 +8,13 @@ This project is a simple console-based bank management system built to practice 
 
 The program manages bank clients and system users through a text-based menu. Client data is stored in `Clients.txt`, and user data is stored in `Users.txt`. The application supports viewing, adding, deleting, updating, and finding client information, as well as performing deposits, withdrawals, and balance checks. It also includes user management with permission-based access.
 
+Users must authenticate with a username and password before using the system; permissions attached to each user control which menu operations are available.
+
 ## Features
 
+- Login authentication (username/password) with per-user permission enforcement
+- Permission bitmask design allowing granular access control
+- Admin account with full permissions (-1) for managing users
 - View the full list of bank clients.
 - Add new clients with account number, PIN, name, phone, and balance.
 - Delete existing client records.
@@ -48,12 +53,14 @@ The `Permissions` value is stored as an integer bitmask, and `-1` means full per
 
 1. Create `Clients.txt` and `Users.txt` in the project folder.
 2. Add an admin user record to `Users.txt`.
-3. Run the program.
-4. Choose an option from the main menu.
-5. For client management, enter the required account information.
-6. For transactions, enter the account number and transaction amount.
-7. Follow the on-screen prompts to confirm actions.
-8. Use the menu to continue working with clients or exit the program.
+   - Example admin record: `admin#//#1234#//#-1` (username `admin`, password `1234`, full permissions)
+3. Run the program and log in with an existing user from `Users.txt`.
+4. After logging in, use the main menu. Options are enabled or disabled based on the logged-in user's permissions.
+5. To manage users (create, update, delete), use the `User Managment` menu — only users with `MANAGE_USERS` permission can access it.
+6. For client management, enter the required account information.
+7. For transactions, enter the account number and transaction amount.
+8. Follow the on-screen prompts to confirm actions.
+9. Use the menu to continue working with clients or logout.
 
 ## How to run
 
@@ -65,6 +72,9 @@ The `Permissions` value is stored as an integer bitmask, and `-1` means full per
 
 ## Programming topics covered
 
+- Authentication (login) and password verification
+- Bitmask-based permission design and permission checks
+- Simple role-like admin behavior and safe user management constraints
 - C++ input/output (`cin`, `cout`, `getline`)
 - Control flow (`if`, `switch`, loops)
 - Structures for grouping related client data
@@ -97,3 +107,31 @@ User data is stored in `Users.txt` using a delimited format:
 - Username
 - Password
 - Permissions
+
+The `Permissions` field is an integer bitmask controlling access to features (see the "Login and Permissions" section). The default administrator account should be present in `Users.txt` so an admin can manage users and permissions.
+
+## Login and Permissions
+
+This program requires users to authenticate before using the system. User records are stored in `Users.txt` (see format above). On startup the program shows a login prompt asking for a username and password. After successful login the application enforces permission checks for each main menu option.
+
+Users must exist in `Users.txt` before they can login. The default admin account must be present so an administrator can manage other users. Example admin user record:
+
+admin#//#1234#//#-1
+
+The record fields are: `Username#//#Password#//#Permissions`.
+
+Permissions are stored as an integer bitmask. The program defines these permission flags (values shown):
+
+- READ_CLIENTS (1) — Show clients list
+- ADD_CLIENTS (2) — Add new clients
+- DELETE_CLIENTS (4) — Delete clients
+- UPDATE_CLIENTS (8) — Update clients
+- FIND_CLIENTS (16) — Find clients
+- MANAGE_TRANSACTIONS (32) — Deposit/Withdraw/Total balances
+- MANAGE_USERS (64) — Show/Add/Delete/Update/Find users
+
+You can combine permissions by summing flag values. For example, `1 + 2 + 32 = 35` gives read, add, and transaction permissions.
+
+The special value `-1` means full permissions (administrator). The program prevents deleting or updating the `admin` user from the user management screens.
+
+When creating or updating a user through the program, the UI asks whether to grant full permissions; if not, it interactively asks which permissions to enable and builds the bitmask accordingly.
